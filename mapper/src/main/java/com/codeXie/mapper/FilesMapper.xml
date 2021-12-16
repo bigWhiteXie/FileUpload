@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.codeXie.mapper.FilesMapper">
+    <select id="selQueryMapper" resultType="com.codeXie.pojo.FileItem">
+        select * from files
+        <where>
+            <if test="uname!=null and uname!=''">
+                uname=#{uname}
+            </if>
+            <if test="uploadTime!=null and uploadTime!=''">
+                <bind name="mydate" value="'%'+uploadTime+'%'"/>
+                and uploadTime like #{mydate}
+            </if>
+            <if test="fileName!=null and fileName!=''">
+                and fileName=#{fileName}
+            </if>
+        </where>
+        limit #{start},#{size}
+    </select>
+    <select id="selCountMapper" resultType="int">
+        select count(*) from files
+        <where>
+            <if test="uname!=null and uname!=''">
+                uname=#{uname}
+            </if>
+            <if test="uploadTime!=null and uploadTime!=''">
+                <bind name="mydate" value="'%'+uploadTime+'%'"/>
+                and uploadTime like #{mydate}
+            </if>
+            <if test="fileName!=null and fileName!=''">
+                and fileName=#{fileName}
+            </if>
+        </where>
+    </select>
+</mapper>

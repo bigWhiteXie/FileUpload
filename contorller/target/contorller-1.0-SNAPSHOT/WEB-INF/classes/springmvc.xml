@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		  http://www.springframework.org/schema/context
+		 http://www.springframework.org/schema/context/spring-context.xsd
+		 http://www.springframework.org/schema/mvc
+		 http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        ">
+    <!-- 配置注解扫描   -->
+    <context:component-scan base-package="com.codeXie.controller"></context:component-scan>
+
+    <!-- 配置注解解析器   -->
+    <mvc:annotation-driven></mvc:annotation-driven>
+
+    <!--     配置拦截器   -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/fileList.html"/>
+            <bean id="interceptor1" class="com.codeXie.interceptor.FileInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <!-- 配置静态资源放行,优先级低于单元方法   -->
+    <mvc:resources mapping="/js/**" location="WEB-INF/js/"></mvc:resources>
+    <mvc:resources mapping="/css/**" location="WEB-INF/css/"></mvc:resources>
+    <mvc:resources mapping="/img/**" location="WEB-INF/img/"></mvc:resources>
+    <mvc:resources mapping="/editor/**" location="WEB-INF/editor/"></mvc:resources>
+    <mvc:resources mapping="*.html"  location="WEB-INF/page/"></mvc:resources>
+
+    <!-- 配置自定义视图解析器 :需要配置前缀和后缀  -->
+    <bean id="resourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/page/"></property>
+        <property name="suffix" value=""></property>
+    </bean>
+
+
+    <!-- 配置文件上传解析的bean   -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8"></property><!--设置解析的编码格式-->
+        <property name="maxUploadSize" value="12040023"></property><!--设置单个文件的大小，单位是字节-->
+        <property name="maxInMemorySize" value="120400230"></property><!--设置总的大小，单位是字节-->
+    </bean>
+
+
+</beans>

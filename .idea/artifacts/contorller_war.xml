@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="contorller:war">
+    <output-path>$PROJECT_DIR$/contorller/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>contorller</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="contorller-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="contorller:war exploded" />
+    </root>
+  </artifact>
+</component>

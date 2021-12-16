@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>无标题文档</title>
+		<link href="/fileUp/css/style.css" rel="stylesheet" type="text/css" />
+		<link href="/fileUp/css/select.css" rel="stylesheet" type="text/css" />
+
+		<script type="text/javascript" src="/fileUp/js/jquery.js"></script>
+		<script type="text/javascript" src="/fileUp/js/jquery.idTabs.min.js"></script>
+		<script type="text/javascript" src="/fileUp/js/select-ui.min.js"></script>
+		<script type="text/javascript" src="/fileUp/editor/kindeditor.js"></script>
+		<script type="text/javascript">
+		$(document).ready(function(e) {
+		    $(".select1").uedSelect({
+				width : 200		  
+			});
+			
+		});
+		</script>
+
+		<script type="text/javascript">
+			$(document).ready(function(){
+			$(".click").click(function(){
+			  $(".tip").fadeIn(200);
+			});
+			  
+			$(".tiptop a").click(function(){
+			  $(".tip").fadeOut(200);
+			});
+			
+			$(".sure").click(function(){
+			  $(".tip").fadeOut(100);
+			});
+			
+			$(".cancel").click(function(){
+			  $(".tip").fadeOut(100);
+			});
+			
+			});
+		</script>
+		<script>
+			var index=1,size=5;
+			function getData(){
+				var queryData = $("#info").serialize()
+				$.ajax({
+					url:'/fileUp/queryFile?'+queryData,
+					method:'get',
+					data:{index:index,size:size},
+					success:(data)=>{
+						index = data.index
+						size = data.size
+						console.log(data)
+						$('#tb').empty();
+						$(data.list).each((index,item)=>{
+							$("#tb").append('<tr>'+
+									'<td>'+
+									'<input name="" type="checkbox" value="" />'+
+									'</td>'+
+									'<td>'+item.fileName+'</td>'+
+									'<td>'+item.uploadTime+'</td>'+
+									'<td>'+item.uname+'</td>'+
+									'<td>'+
+									'<a href="javascript:void(0)" class="tablelink " onclick="downFile('+"'"+item.position+"','"+item.fileName+"'"+')">下载</a> '+
+									'<a href="javascript:void(0)" class="tablelink click" onclick="delFile('+"'"+item.position+"',"+index+')"> 删除</a>'+
+									'</td>'+
+									'</tr>')
+						})
+						$("#count").html(data.totalCount)
+						$("#index").html(data.index)
+						$(".paginList").empty()
+						for(var i=1;i <= data.totalPageCount;i++){
+							if(data.index != i){
+								$(".paginList").append('<li class="paginItem" onclick="getPage('+i+')"><a href="javascript:;">'+i+'</a></li>')
+							}else{
+								$(".paginList").append('<li class="paginItem current" onclick="getPage('+i+')"><a href="javascript:;">'+i+'</a></li>')
+							}
+						}
+					}
+				})
+			}
+
+			function getPage(i){
+				index=i
+				getData()
+			}
+
+			function upload(){
+				//获取存储了选择的文件信息的对象
+				var reqData=$("#file")[0].files[0];
+				//使用FormData对象，告诉浏览器获取资源的二进制数据作为请求数据
+				var fm=new FormData();//存储在FormData对象中的资源浏览器会以二进制的形式发送给服务器
+				fm.append("file",reqData);//一个append方法表示一个要转换的资源
+				//发起Ajax请求
+				$.ajax({
+					url:"/fileUp/uploadFile",
+					type:"post",
+					processData:false,//设置false
+					contentType:false,//设置false，将请求数据类型设置为multipart/form-data，以请求头的形式来告诉服务器
+					data:fm,
+					success:function (data) {//成功的回调函数
+						if(data.status == 'ok'){
+							alert("上传成功");
+							getData()
+
+						}else{
+							alert("上传失败");
+						}
+					}
+				})
+			}
+			
+			function downFile(position,fileName){
+				window.location.href = "/fileUp/downloadFile?position="+position+"&fileName="+fileName
+			}
+			
+			function delFile(position,i){
+				if(confirm("确认要删除吗")){
+					$.ajax({
+						url:'/fileUp/delFile',
+						method:'get',
+						data:{position:position},
+						success:(data)=>{
+							if(data.status == 'ok'){
+								if(i%size==1 && index>1){
+									index--
+								}
+								getData()
+							}
+						}
+					})
+				}
+			}
+			
+			$(()=>{
+				getData()
+			})
+		</script>
+
+	</head>
+
+	<body>
+		<div class="rightinfo">
+			<form id="info">
+				<ul class="prosearch">
+					<li>
+						<label>查询：</label><i>文件名</i>
+						<a>
+							<input name="fileName" type="text" class="scinput" />
+						</a>
+						<i>上传时间</i>
+						<a>
+							<input name="uploadTime" type="date"/>
+						</a>
+									
+					</li>
+					<li>
+						<label>上传者：</label>
+						<a>
+							<input name="uname" type="text" class="scinput" />
+						</a>		
+					</li>
+					<li>
+						<a>
+							<input id="save" type="button" class="sure" value="查询" onclick="getData()"/>
+						</a>
+					</li>
+				</ul>
+			</form>
+
+			<div class="formtitle1"><span>文件列表</span></div>
+
+			<table class="tablelist">
+				<thead>
+					<tr>
+						<th>
+							<input name="" type="checkbox" value="" checked="checked" />
+						</th>
+						<th>文件名<i class="sort"><img src="/fileUp/img/px.gif" /></i></th>
+						<th>上传时间</th>
+						<th>上传者</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody id="tb">
+					
+
+				</tbody>
+			</table>
+
+			<div class="pagin">
+				<div class="message">共<i class="blue" id="count">5</i>条记录，当前显示第&nbsp;<i class="blue" id="index">1&nbsp;</i>页</div>
+				<ul class="paginList">
+					
+				</ul>
+			</div>
+			<input type="file" id="file" style="margin-right: 30px" /> <input onclick="upload()" class="btn" value="上传" type="button" />
+
+			<div class="tip">
+				<div class="tiptop"><span>提示信息</span>
+					<a></a>
+				</div>
+
+				<div class="tipinfo">
+					<span><img src="../images/ticon.png" /></span>
+					<div class="tipright">
+						<p>是否确认对信息的修改 ？</p>
+						<cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+					</div>
+				</div>
+
+				<div class="tipbtn">
+					<input name="" type="button" class="sure" value="确定" />&nbsp;
+					<input name="" type="button" class="cancel" value="取消" />
+				</div>
+
+			</div>
+
+		</div>
+
+		<script type="text/javascript">
+			$('.tablelist tbody tr:odd').addClass('odd');
+		</script>
+
+	</body>
+
+</html>
