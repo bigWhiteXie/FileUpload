@@ -79,6 +79,7 @@ public class UserController {
         String suffix = fileName.substring(fileName.lastIndexOf("."));
 
         //2.将文件上传到文件夹中
+        ServletContext c = request.getServletContext();
         String path = request.getRealPath("/upload");
         File dir = new File(path);
         //如果文件夹不存在则创建文件夹
